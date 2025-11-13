@@ -528,14 +528,21 @@
         }
 
         .segment.winner-highlight {
-            filter: brightness(1.3) drop-shadow(0 0 20px rgba(255, 255, 255, 0.8));
-            animation: winnerGlow 0.6s ease-out;
+            filter: brightness(1.5) drop-shadow(0 0 40px rgba(255, 255, 255, 1)) drop-shadow(0 0 80px rgba(255, 215, 0, 0.8));
+            animation: winnerGlow 1s ease-out infinite;
+            z-index: 10;
         }
 
         @keyframes winnerGlow {
-            0% { filter: brightness(1) drop-shadow(0 0 0px rgba(255, 255, 255, 0)); }
-            50% { filter: brightness(1.4) drop-shadow(0 0 30px rgba(255, 255, 255, 1)); }
-            100% { filter: brightness(1.3) drop-shadow(0 0 20px rgba(255, 255, 255, 0.8)); }
+            0% { 
+                filter: brightness(1.2) drop-shadow(0 0 20px rgba(255, 255, 255, 0.5)); 
+            }
+            50% { 
+                filter: brightness(1.6) drop-shadow(0 0 60px rgba(255, 255, 255, 1)) drop-shadow(0 0 80px rgba(255, 215, 0, 1)); 
+            }
+            100% { 
+                filter: brightness(1.5) drop-shadow(0 0 40px rgba(255, 255, 255, 1)) drop-shadow(0 0 80px rgba(255, 215, 0, 0.8)); 
+            }
         }
 
         .segment-name {
@@ -570,6 +577,12 @@
             backdrop-filter: blur(10px);
         }
 
+        .info-box:has(.winner-announcement) {
+            background: rgba(255, 215, 0, 0.15);
+            border: 2px solid rgba(255, 215, 0, 0.6);
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+        }
+
         .info-box-title {
             font-size: 11px;
             font-weight: 600;
@@ -596,12 +609,19 @@
 
         .info-box-content.winner-announcement {
             animation: bounceIn 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            font-size: 32px !important;
+            font-weight: 900 !important;
+            text-shadow: 0 0 30px rgba(255, 215, 0, 0.8);
+            background: linear-gradient(135deg, #FFD700 0%, #FFA500 50%, #FF6B9D 100%) !important;
+            -webkit-background-clip: text !important;
+            -webkit-text-fill-color: transparent !important;
+            background-clip: text !important;
         }
 
         @keyframes bounceIn {
-            0% { opacity: 0; transform: scale(0.3); }
-            50% { opacity: 1; transform: scale(1.05); }
-            70% { transform: scale(0.95); }
+            0% { opacity: 0; transform: scale(0); }
+            50% { opacity: 1; transform: scale(1.3); }
+            70% { transform: scale(0.9); }
             100% { transform: scale(1); }
         }
 
@@ -784,9 +804,16 @@
             animation: pulseSpin 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
         }
 
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateY(-20px); }
-            to { opacity: 1; transform: translateY(0); }
+        @keyframes celebrate {
+            0% { transform: translateY(0) scale(1); opacity: 1; }
+            100% { transform: translateY(-100px) scale(0); opacity: 0; }
+        }
+
+        .celebration-particle {
+            position: fixed;
+            pointer-events: none;
+            font-size: 30px;
+            z-index: 9999;
         }
 
         .toast {
@@ -961,7 +988,12 @@
 
     <script>
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('sw.js').catch(e => console.log('SW registration failed'));
+            navigator.serviceWorker.register('sw.js')
+                .then(reg => console.log('✅ Service Worker registered successfully'))
+                .catch(e => {
+                    console.warn('⚠️ Service Worker registration failed:', e.message);
+                    console.warn('The app will still work, but offline support is disabled');
+                });
         }
 
         const state = {
@@ -989,6 +1021,25 @@
             toast.textContent = msg;
             document.body.appendChild(toast);
             setTimeout(() => toast.remove(), 3000);
+        }
+
+        function celebrateWinner() {
+            const confetti = ['🎉', '🎊', '✨', '🌟', '⭐', '🏆', '👑', '💫'];
+            const winnerBox = document.getElementById('winnerDisplay');
+            const rect = winnerBox.getBoundingClientRect();
+            
+            for (let i = 0; i < 20; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'celebration-particle';
+                particle.textContent = confetti[Math.floor(Math.random() * confetti.length)];
+                particle.style.left = (rect.left + rect.width / 2) + 'px';
+                particle.style.top = (rect.top + rect.height / 2) + 'px';
+                particle.style.animation = `celebrate ${1.5 + Math.random() * 0.5}s ease-out`;
+                particle.style.transform = `rotate(${Math.random() * 360}deg)`;
+                document.body.appendChild(particle);
+                
+                setTimeout(() => particle.remove(), 2000);
+            }
         }
 
         function getOrdinal(n) {
@@ -1190,17 +1241,21 @@
                     pointer.classList.remove('spinning');
                     
                     setTimeout(() => {
+                        // Calculate which segment is pointing at the compass (top pointer)
+                        // The segment that's at 0° (pointing at compass) after rotation is the winner
+                        const winnerSegment = Math.floor((endRotation / anglePerSegment) % numParticipants);
+                        
                         const segments = wheel.querySelectorAll('.segment');
                         segments.forEach(seg => seg.classList.remove('winner-highlight'));
                         
-                        if (randomSegment < segments.length) {
-                            segments[randomSegment].classList.add('winner-highlight');
+                        if (winnerSegment < segments.length) {
+                            segments[winnerSegment].classList.add('winner-highlight');
                         }
                         
                         setTimeout(() => {
                             state.currentWinner = { 
-                                name: state.participants[randomSegment], 
-                                index: randomSegment 
+                                name: state.participants[winnerSegment], 
+                                index: winnerSegment 
                             };
                             const pos = state.winners.length + 1;
                             const winnerDisplay = document.getElementById('winnerDisplay');
@@ -1208,6 +1263,9 @@
                             winnerDisplay.classList.add('winner-announcement');
                             
                             document.getElementById('statusDisplay').textContent = getOrdinal(pos) + ' Winner!';
+                            
+                            // Trigger celebration
+                            celebrateWinner();
                             
                             setTimeout(() => {
                                 winnerDisplay.classList.remove('winner-announcement');
