@@ -2,15 +2,34 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Chitty Bidding Wheel - Modern</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Winner">
+    <meta name="theme-color" content="#0f172a">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="full-screen" content="yes">
+    <meta name="browsermode" content="application">
+    
+    <!-- iOS App Icons -->
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><rect fill='%236366f1' width='180' height='180'/><text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' font-size='80' font-weight='bold' fill='white' font-family='sans-serif'>W</text></svg>">
+    
+    <!-- Android App Icons & Manifest -->
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect fill='%236366f1' width='192' height='192'/><text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' font-size='100' font-weight='bold' fill='white' font-family='sans-serif'>W</text></svg>">
+    
+    <title>Winner</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            -webkit-user-select: none;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
         }
 
         :root {
@@ -20,35 +39,50 @@
             --success: #10b981;
             --warning: #f59e0b;
             --danger: #ef4444;
+            --safe-top: max(16px, env(safe-area-inset-top));
+            --safe-bottom: max(16px, env(safe-area-inset-bottom));
+            --safe-left: max(0, env(safe-area-inset-left));
+            --safe-right: max(0, env(safe-area-inset-right));
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            position: fixed;
+            overflow: hidden;
         }
 
         body {
-            font-family: 'Inter', sans-serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             background: #f8fafc;
             color: #1e293b;
+            -webkit-font-smoothing: antialiased;
+            -webkit-touch-callout: none;
         }
 
         /* ============ SETUP VIEW ============ */
         .setup-view {
-            min-height: 100vh;
+            width: 100%;
+            height: 100%;
             background: linear-gradient(135deg, #f8fafc 0%, #e0e7ff 100%);
             display: flex;
             flex-direction: column;
+            overflow: hidden;
         }
 
         .setup-header {
             background: white;
             border-bottom: 1px solid #e2e8f0;
-            padding: 20px;
+            padding: 16px;
+            padding-top: calc(16px + var(--safe-top));
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            flex-shrink: 0;
         }
 
         .header-content {
-            max-width: 1200px;
-            margin: 0 auto;
             display: flex;
             align-items: center;
-            justify-content: space-between;
+            justify-content: center;
         }
 
         .logo-section {
@@ -58,47 +92,55 @@
         }
 
         .logo-icon {
-            font-size: 28px;
+            font-size: 32px;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-8px); }
         }
 
         .logo-text {
-            font-size: 24px;
-            font-weight: 700;
+            font-size: 28px;
+            font-weight: 800;
             background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
+            letter-spacing: -1px;
         }
 
         .setup-content {
             flex: 1;
-            max-width: 1200px;
             width: 100%;
-            margin: 0 auto;
-            padding: 30px 20px;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 30px;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            padding: 16px;
+            padding-bottom: calc(16px + var(--safe-bottom));
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
         }
 
         .card {
             background: white;
             border-radius: 16px;
-            padding: 30px;
+            padding: 20px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
             border: 1px solid #e2e8f0;
             transition: all 0.3s ease;
+            flex-shrink: 0;
         }
 
-        .card:hover {
+        .card:active {
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-            border-color: var(--primary);
         }
 
         .card-title {
-            font-size: 20px;
+            font-size: 18px;
             font-weight: 700;
-            margin-bottom: 25px;
+            margin-bottom: 20px;
             display: flex;
             align-items: center;
             gap: 10px;
@@ -109,12 +151,12 @@
         }
 
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 16px;
         }
 
         .form-label {
             display: block;
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 600;
             text-transform: uppercase;
             color: #64748b;
@@ -124,12 +166,15 @@
 
         input, select {
             width: 100%;
-            padding: 12px 14px;
+            padding: 14px;
             border: 1px solid #e2e8f0;
-            border-radius: 10px;
+            border-radius: 12px;
             font-family: 'Inter', sans-serif;
-            font-size: 14px;
+            font-size: 16px;
             transition: all 0.2s ease;
+            background: white;
+            -webkit-appearance: none;
+            appearance: none;
         }
 
         input:focus, select:focus {
@@ -141,13 +186,13 @@
         .form-row {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 15px;
+            gap: 12px;
         }
 
         .btn {
-            padding: 12px 24px;
+            padding: 14px 20px;
             border: none;
-            border-radius: 10px;
+            border-radius: 12px;
             font-size: 14px;
             font-weight: 600;
             cursor: pointer;
@@ -157,7 +202,13 @@
             letter-spacing: 0.5px;
             display: inline-flex;
             align-items: center;
+            justify-content: center;
             gap: 8px;
+            active: active;
+        }
+
+        .btn:active {
+            transform: scale(0.98);
         }
 
         .btn-primary {
@@ -166,25 +217,16 @@
             box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
         }
 
-        .btn-primary:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(99, 102, 241, 0.4);
-        }
-
         .btn-secondary {
             background: #f1f5f9;
             color: #64748b;
             border: 1px solid #e2e8f0;
         }
 
-        .btn-secondary:hover:not(:disabled) {
-            background: #e2e8f0;
-        }
-
         .btn-group {
             display: flex;
             gap: 12px;
-            margin-top: 25px;
+            margin-top: 20px;
         }
 
         .btn-group .btn {
@@ -197,11 +239,11 @@
         }
 
         .participants-section {
-            margin-top: 25px;
+            margin-top: 16px;
         }
 
         .participants-label {
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 600;
             text-transform: uppercase;
             color: #64748b;
@@ -220,6 +262,7 @@
 
         .input-with-btn .btn {
             flex: 0 0 auto;
+            padding: 14px 16px;
         }
 
         .participants-list {
@@ -227,14 +270,17 @@
             flex-wrap: wrap;
             gap: 10px;
             margin-top: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
         }
 
         .participant-badge {
             background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(236, 72, 153, 0.1) 100%);
             border: 1px solid var(--primary);
             border-radius: 20px;
-            padding: 8px 12px;
-            font-size: 13px;
+            padding: 10px 14px;
+            font-size: 14px;
             font-weight: 500;
             color: var(--primary);
             display: flex;
@@ -244,18 +290,18 @@
 
         .badge-remove {
             cursor: pointer;
-            width: 18px;
-            height: 18px;
+            width: 20px;
+            height: 20px;
             border-radius: 50%;
             background: rgba(99, 102, 241, 0.2);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 12px;
+            font-size: 14px;
             transition: all 0.2s ease;
         }
 
-        .badge-remove:hover {
+        .badge-remove:active {
             background: rgba(239, 68, 68, 0.3);
             color: var(--danger);
         }
@@ -264,7 +310,7 @@
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 12px;
-            margin-top: 20px;
+            margin-top: 16px;
         }
 
         .stat-box {
@@ -276,7 +322,7 @@
         }
 
         .stat-value {
-            font-size: 24px;
+            font-size: 22px;
             font-weight: 700;
             background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
             -webkit-background-clip: text;
@@ -293,33 +339,33 @@
 
         .empty-state {
             text-align: center;
-            padding: 30px 20px;
+            padding: 20px 16px;
             color: #cbd5e1;
         }
 
         .empty-state-icon {
-            font-size: 48px;
+            font-size: 40px;
             margin-bottom: 12px;
             opacity: 0.5;
         }
 
         .start-session-btn {
             width: 100%;
-            padding: 14px;
+            padding: 16px;
             background: linear-gradient(135deg, var(--success) 0%, #059669 100%);
             color: white;
             border: none;
-            border-radius: 10px;
-            font-size: 14px;
+            border-radius: 12px;
+            font-size: 15px;
             font-weight: 700;
             cursor: pointer;
-            margin-top: 20px;
+            margin-top: 16px;
             box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+            font-family: 'Inter', sans-serif;
         }
 
-        .start-session-btn:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
+        .start-session-btn:active:not(:disabled) {
+            transform: scale(0.98);
         }
 
         .start-session-btn:disabled {
@@ -330,7 +376,8 @@
         /* ============ SPINNING SESSION VIEW ============ */
         .spinning-view {
             display: none;
-            min-height: 100vh;
+            width: 100%;
+            height: 100%;
             background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
             color: white;
             position: fixed;
@@ -341,6 +388,10 @@
             z-index: 1000;
             overflow: hidden;
             flex-direction: column;
+            padding-top: var(--safe-top);
+            padding-left: var(--safe-left);
+            padding-right: var(--safe-right);
+            padding-bottom: var(--safe-bottom);
         }
 
         .spinning-view.active {
@@ -350,11 +401,12 @@
         .spinning-header {
             background: rgba(255, 255, 255, 0.05);
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 16px 20px;
+            padding: 14px 16px;
             display: flex;
             align-items: center;
             justify-content: space-between;
             backdrop-filter: blur(10px);
+            flex-shrink: 0;
         }
 
         .spinning-header-title {
@@ -363,8 +415,8 @@
         }
 
         .close-btn {
-            width: 36px;
-            height: 36px;
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
             border: none;
             background: rgba(255, 255, 255, 0.1);
@@ -377,18 +429,19 @@
             justify-content: center;
         }
 
-        .close-btn:hover {
+        .close-btn:active {
             background: rgba(255, 255, 255, 0.2);
-            transform: scale(1.1);
+            transform: scale(0.95);
         }
 
         .spinning-content {
             flex: 1;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            padding: 20px;
-            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            padding: 16px;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
         }
 
         .wheel-panel {
@@ -396,12 +449,13 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
+            flex-shrink: 0;
         }
 
         .wheel-wrapper {
             position: relative;
             width: 100%;
-            max-width: 450px;
+            max-width: 320px;
             aspect-ratio: 1;
         }
 
@@ -410,8 +464,8 @@
             height: 100%;
             border-radius: 50%;
             position: relative;
-            box-shadow: 0 0 0 12px rgba(255, 255, 255, 0.95), 
-                        0 0 0 14px rgba(0, 0, 0, 0.15),
+            box-shadow: 0 0 0 10px rgba(255, 255, 255, 0.95), 
+                        0 0 0 12px rgba(0, 0, 0, 0.15),
                         inset 0 0 50px rgba(0, 0, 0, 0.25),
                         0 50px 120px rgba(0, 0, 0, 0.6);
             border: 4px solid rgba(255, 255, 255, 0.7);
@@ -421,14 +475,14 @@
 
         .pointer {
             position: absolute;
-            top: -32px;
+            top: -28px;
             left: 50%;
             transform: translateX(-50%);
             width: 0;
             height: 0;
-            border-left: 28px solid transparent;
-            border-right: 28px solid transparent;
-            border-top: 55px solid #ff6b9d;
+            border-left: 24px solid transparent;
+            border-right: 24px solid transparent;
+            border-top: 48px solid #ff6b9d;
             z-index: 10;
             filter: drop-shadow(0 10px 25px rgba(255, 107, 157, 0.9));
             animation: pulse 1.5s ease-in-out infinite;
@@ -436,8 +490,8 @@
 
         .center-circle {
             position: absolute;
-            width: 140px;
-            height: 140px;
+            width: 120px;
+            height: 120px;
             background: linear-gradient(135deg, #ffffff 0%, #f0f0f0 100%);
             border-radius: 50%;
             top: 50%;
@@ -450,11 +504,11 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            border: 5px solid rgba(255, 107, 157, 0.2);
+            border: 4px solid rgba(255, 107, 157, 0.2);
         }
 
         .center-icon {
-            font-size: 65px;
+            font-size: 56px;
             filter: drop-shadow(0 3px 10px rgba(0, 0, 0, 0.3));
         }
 
@@ -479,68 +533,60 @@
         }
 
         @keyframes winnerGlow {
-            0% {
-                filter: brightness(1) drop-shadow(0 0 0px rgba(255, 255, 255, 0));
-            }
-            50% {
-                filter: brightness(1.4) drop-shadow(0 0 30px rgba(255, 255, 255, 1));
-            }
-            100% {
-                filter: brightness(1.3) drop-shadow(0 0 20px rgba(255, 255, 255, 0.8));
-            }
+            0% { filter: brightness(1) drop-shadow(0 0 0px rgba(255, 255, 255, 0)); }
+            50% { filter: brightness(1.4) drop-shadow(0 0 30px rgba(255, 255, 255, 1)); }
+            100% { filter: brightness(1.3) drop-shadow(0 0 20px rgba(255, 255, 255, 0.8)); }
         }
 
         .segment-name {
             position: absolute;
             text-align: center;
-            font-size: 22px;
+            font-size: 18px;
             font-weight: 900;
             writing-mode: vertical-rl;
             text-orientation: mixed;
-            transform: translateY(-110px) rotate(180deg);
-            max-width: 150px;
+            transform: translateY(-95px) rotate(180deg);
+            max-width: 120px;
             line-height: 1.2;
             letter-spacing: 1.5px;
             white-space: normal;
             z-index: 3;
             pointer-events: none;
             left: 50%;
-            transform: translateX(-50%) translateY(-110px) rotate(180deg);
         }
 
         .info-panel {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            overflow-y: auto;
-            padding-right: 10px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            flex-shrink: 0;
         }
 
         .info-box {
             background: rgba(255, 255, 255, 0.05);
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 12px;
-            padding: 15px;
+            padding: 12px;
             backdrop-filter: blur(10px);
         }
 
         .info-box-title {
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.5px;
             opacity: 0.7;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
         }
 
         .info-box-content {
-            font-size: 28px;
+            font-size: 24px;
             font-weight: 700;
             background: linear-gradient(135deg, #818cf8 0%, #ec4899 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            min-height: 40px;
+            min-height: 36px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -553,55 +599,44 @@
         }
 
         @keyframes bounceIn {
-            0% {
-                opacity: 0;
-                transform: scale(0.3);
-            }
-            50% {
-                opacity: 1;
-                transform: scale(1.05);
-            }
-            70% {
-                transform: scale(0.95);
-            }
-            100% {
-                transform: scale(1);
-            }
+            0% { opacity: 0; transform: scale(0.3); }
+            50% { opacity: 1; transform: scale(1.05); }
+            70% { transform: scale(0.95); }
+            100% { transform: scale(1); }
         }
 
         .participants-box {
             background: rgba(255, 255, 255, 0.05);
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 12px;
-            padding: 15px;
+            padding: 12px;
             backdrop-filter: blur(10px);
-            flex: 1;
-            display: flex;
-            flex-direction: column;
+            grid-column: 1 / -1;
         }
 
         .participants-box-title {
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.5px;
             opacity: 0.7;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
         }
 
         .participants-list-scroll {
-            flex: 1;
+            max-height: 120px;
             overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 6px;
         }
 
         .participant-item {
             background: rgba(255, 255, 255, 0.05);
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 8px;
-            padding: 10px 12px;
+            padding: 10px;
             font-size: 13px;
             font-weight: 500;
             display: flex;
@@ -626,25 +661,27 @@
             background: rgba(16, 185, 129, 0.1);
             border: 1px solid rgba(16, 185, 129, 0.3);
             border-radius: 12px;
-            padding: 15px;
+            padding: 12px;
             backdrop-filter: blur(10px);
+            grid-column: 1 / -1;
         }
 
         .winners-box-title {
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.5px;
             color: #10b981;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
         }
 
         .winners-list-scroll {
-            max-height: 150px;
+            max-height: 120px;
             overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 6px;
         }
 
         .winner-item {
@@ -671,11 +708,12 @@
         }
 
         .spinning-controls {
-            padding: 20px;
+            padding: 12px;
             border-top: 1px solid rgba(255, 255, 255, 0.1);
             display: flex;
-            gap: 12px;
+            gap: 10px;
             background: rgba(255, 255, 255, 0.02);
+            flex-shrink: 0;
         }
 
         .spin-btn {
@@ -686,15 +724,15 @@
             border: none;
             border-radius: 10px;
             font-weight: 700;
-            font-size: 14px;
+            font-size: 13px;
             cursor: pointer;
             transition: all 0.2s ease;
             box-shadow: 0 4px 12px rgba(255, 107, 157, 0.4);
+            font-family: 'Inter', sans-serif;
         }
 
-        .spin-btn:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(255, 107, 157, 0.5);
+        .spin-btn:active:not(:disabled) {
+            transform: scale(0.96);
         }
 
         .spin-btn:disabled {
@@ -710,15 +748,16 @@
             border: 1px solid rgba(16, 185, 129, 0.5);
             border-radius: 10px;
             font-weight: 700;
-            font-size: 14px;
+            font-size: 13px;
             cursor: pointer;
             transition: all 0.2s ease;
             display: none;
+            font-family: 'Inter', sans-serif;
         }
 
-        .next-btn:hover:not(:disabled) {
+        .next-btn:active:not(:disabled) {
             background: rgba(16, 185, 129, 0.3);
-            transform: translateY(-2px);
+            transform: scale(0.96);
         }
 
         .next-btn:disabled {
@@ -746,20 +785,15 @@
         }
 
         @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(-20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .toast {
             position: fixed;
-            top: 20px;
-            right: 20px;
+            bottom: 20px;
+            left: 16px;
+            right: 16px;
             background: white;
             color: #1e293b;
             padding: 14px 18px;
@@ -769,7 +803,6 @@
             font-weight: 500;
             animation: slideIn 0.3s ease;
             z-index: 10000;
-            max-width: 320px;
         }
 
         .toast.error {
@@ -783,223 +816,6 @@
             color: #166534;
             border-left: 4px solid #10b981;
         }
-
-        /* ============ MOBILE RESPONSIVE ============ */
-        @media (max-width: 1024px) {
-            .spinning-content {
-                grid-template-columns: 1fr;
-                gap: 15px;
-            }
-
-            .info-panel {
-                grid-template-columns: repeat(3, 1fr);
-                flex-direction: row;
-            }
-
-            .participants-box {
-                grid-column: 1 / -1;
-                max-height: 120px;
-            }
-
-            .winners-box {
-                grid-column: 1 / -1;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .setup-content {
-                grid-template-columns: 1fr;
-                padding: 20px 15px;
-                gap: 20px;
-            }
-
-            .wheel-wrapper {
-                max-width: 350px;
-            }
-
-            .pointer {
-                top: -24px;
-                border-left: 20px solid transparent;
-                border-right: 20px solid transparent;
-                border-top: 42px solid #ff6b9d;
-            }
-
-            .center-circle {
-                width: 105px;
-                height: 105px;
-            }
-
-            .center-icon {
-                font-size: 48px;
-            }
-
-            .segment-name {
-                font-size: 18px;
-                letter-spacing: 1.2px;
-            }
-
-            .info-panel {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 10px;
-            }
-
-            .info-box {
-                padding: 12px;
-            }
-
-            .info-box-content {
-                font-size: 20px;
-            }
-
-            .participants-box {
-                grid-column: 1 / -1;
-                max-height: 100px;
-            }
-
-            .winners-box {
-                grid-column: 1 / -1;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .setup-header {
-                padding: 12px;
-            }
-
-            .logo-text {
-                font-size: 18px;
-            }
-
-            .setup-content {
-                padding: 15px 12px;
-                gap: 15px;
-            }
-
-            .card {
-                padding: 15px;
-            }
-
-            .card-title {
-                font-size: 16px;
-            }
-
-            .form-label {
-                font-size: 12px;
-            }
-
-            input, select {
-                padding: 10px 12px;
-                font-size: 13px;
-            }
-
-            .btn {
-                padding: 10px 14px;
-                font-size: 12px;
-            }
-
-            .form-row {
-                grid-template-columns: 1fr;
-            }
-
-            .participant-badge {
-                font-size: 12px;
-                padding: 6px 10px;
-            }
-
-            .stat-value {
-                font-size: 20px;
-            }
-
-            .spinning-header {
-                padding: 12px 15px;
-            }
-
-            .spinning-header-title {
-                font-size: 16px;
-            }
-
-            .spinning-content {
-                grid-template-columns: 1fr;
-                padding: 12px;
-                gap: 12px;
-            }
-
-            .wheel-wrapper {
-                max-width: 100%;
-                width: 95%;
-            }
-
-            .pointer {
-                top: -20px;
-                border-left: 18px solid transparent;
-                border-right: 18px solid transparent;
-                border-top: 36px solid #ff6b9d;
-            }
-
-            .center-circle {
-                width: 90px;
-                height: 90px;
-            }
-
-            .center-icon {
-                font-size: 40px;
-            }
-
-            .segment-name {
-                font-size: 15px;
-                letter-spacing: 1px;
-            }
-
-            .info-panel {
-                grid-template-columns: 1fr;
-                gap: 8px;
-                max-height: 200px;
-                overflow-y: auto;
-            }
-
-            .info-box {
-                padding: 10px;
-            }
-
-            .info-box-title {
-                font-size: 11px;
-            }
-
-            .info-box-content {
-                font-size: 18px;
-            }
-
-            .participants-box {
-                grid-column: 1;
-                max-height: 120px;
-            }
-
-            .winners-box {
-                grid-column: 1;
-            }
-
-            .participant-item {
-                font-size: 12px;
-                padding: 8px 10px;
-            }
-
-            .spinning-controls {
-                padding: 12px;
-                gap: 8px;
-            }
-
-            .spin-btn,
-            .next-btn {
-                padding: 12px;
-                font-size: 12px;
-            }
-
-            .toast {
-                right: 10px;
-                left: 10px;
-                max-width: none;
-            }
-        }
     </style>
 </head>
 <body>
@@ -1008,43 +824,43 @@
         <div class="setup-header">
             <div class="header-content">
                 <div class="logo-section">
-                    <div class="logo-icon">🎡</div>
-                    <div class="logo-text">Chitty Wheel</div>
+                    <div class="logo-icon">🏆</div>
+                    <div class="logo-text">Winner</div>
                 </div>
             </div>
         </div>
 
         <div class="setup-content">
-            <!-- Chitty Setup Card -->
+            <!-- Event Setup Card -->
             <div class="card">
                 <div class="card-title">
                     <span class="card-title-icon">⚙️</span>
-                    Chitty Setup
+                    Event Setup
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label">Chitty Name</label>
-                    <input type="text" id="chittyName" placeholder="Enter chitty name...">
+                    <label class="form-label">Event Name</label>
+                    <input type="text" id="chittyName" placeholder="Enter event name...">
                 </div>
 
                 <div class="form-row">
                     <div class="form-group">
-                        <label class="form-label">Starting Month</label>
+                        <label class="form-label">Start Date</label>
                         <input type="month" id="startMonth">
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Monthly Payment (₹)</label>
+                        <label class="form-label">Prize (₹)</label>
                         <input type="number" id="monthlyPayment" placeholder="0" min="0">
                     </div>
                 </div>
 
                 <div class="stats" id="statsBox" style="display: none;">
                     <div class="stat-box">
-                        <div class="stat-label">Total Amount</div>
+                        <div class="stat-label">Total Prize Pool</div>
                         <div class="stat-value" id="totalAmount">₹0</div>
                     </div>
                     <div class="stat-box">
-                        <div class="stat-label">Months</div>
+                        <div class="stat-label">Rounds</div>
                         <div class="stat-value" id="totalMonths">0</div>
                     </div>
                 </div>
@@ -1059,29 +875,29 @@
             <div class="card">
                 <div class="card-title">
                     <span class="card-title-icon">👥</span>
-                    Participants
+                    Add Players
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label">Add Participant</label>
+                    <label class="form-label">Player Name</label>
                     <div class="input-with-btn">
                         <input type="text" id="participantInput" placeholder="Enter name...">
-                        <button class="btn btn-primary" onclick="addParticipant()">Add</button>
+                        <button class="btn btn-primary" onclick="addParticipant()">+</button>
                     </div>
                 </div>
 
                 <div class="participants-section">
-                    <label class="participants-label" id="participantCount">0 Participants</label>
+                    <label class="participants-label" id="participantCount">0 Players</label>
                     <div class="participants-list" id="participantsList">
                         <div class="empty-state">
                             <div class="empty-state-icon">👤</div>
-                            <div style="font-size: 13px; margin-top: 8px;">No participants yet</div>
+                            <div style="font-size: 13px; margin-top: 8px;">No players yet</div>
                         </div>
                     </div>
                 </div>
 
                 <button class="start-session-btn" id="startBtn" onclick="startSpinningSession()" disabled>
-                    🚀 Start Spinning Session
+                    🎯 Start Spinning
                 </button>
             </div>
         </div>
@@ -1090,7 +906,7 @@
     <!-- ============ SPINNING SESSION VIEW ============ -->
     <div class="spinning-view" id="spinningView">
         <div class="spinning-header">
-            <div class="spinning-header-title" id="sessionTitle">🎡 Chitty Live</div>
+            <div class="spinning-header-title" id="sessionTitle">🏆 Winner</div>
             <button class="close-btn" onclick="exitSpinningSession()">✕</button>
         </div>
 
@@ -1101,38 +917,35 @@
                     <div class="pointer"></div>
                     <div class="wheel" id="wheel"></div>
                     <div class="center-circle">
-                        <div class="center-icon">🎁</div>
+                        <div class="center-icon">🏆</div>
                     </div>
                 </div>
             </div>
 
             <!-- Info Panel -->
             <div class="info-panel">
-                <!-- Current Round -->
                 <div class="info-box">
                     <div class="info-box-title">Round</div>
                     <div class="info-box-content" id="roundNumber">1</div>
                 </div>
-
-                <!-- Remaining -->
                 <div class="info-box">
                     <div class="info-box-title">Remaining</div>
                     <div class="info-box-content" id="remainingCount">0</div>
                 </div>
-
-                <!-- Winner Display -->
                 <div class="info-box">
                     <div class="info-box-title">Winner</div>
-                    <div class="info-box-content" id="winnerDisplay" style="font-size: 14px; animation: slideIn 0.6s ease;">-</div>
+                    <div class="info-box-content" id="winnerDisplay" style="font-size: 14px;">-</div>
+                </div>
+                <div class="info-box">
+                    <div class="info-box-title">Status</div>
+                    <div class="info-box-content" id="statusDisplay" style="font-size: 12px;">Ready</div>
                 </div>
 
-                <!-- Participants List -->
                 <div class="participants-box">
-                    <div class="participants-box-title">📋 Next Participants</div>
+                    <div class="participants-box-title">📋 Next Players</div>
                     <div class="participants-list-scroll" id="participantsRemaining"></div>
                 </div>
 
-                <!-- Winners List -->
                 <div class="winners-box">
                     <div class="winners-box-title">🏆 Winners</div>
                     <div class="winners-list-scroll" id="winnersList"></div>
@@ -1141,12 +954,16 @@
         </div>
 
         <div class="spinning-controls">
-            <button class="spin-btn" id="spinBtn" onclick="spinWheel()">SPIN THE WHEEL</button>
-            <button class="next-btn" id="nextBtn" onclick="declareWinner()">NEXT WINNER ➜</button>
+            <button class="spin-btn" id="spinBtn" onclick="spinWheel()">SPIN</button>
+            <button class="next-btn" id="nextBtn" onclick="declareWinner()">NEXT ➜</button>
         </div>
     </div>
 
     <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js').catch(e => console.log('SW registration failed'));
+        }
+
         const state = {
             chittyInfo: { name: '', startMonth: '', monthlyPayment: 0 },
             participants: [],
@@ -1187,21 +1004,21 @@
             const payment = parseFloat(document.getElementById('monthlyPayment').value) || 0;
 
             if (!name || name.length < 2) {
-                showToast('⚠️ Enter chitty name', 'error');
+                showToast('⚠️ Enter event name', 'error');
                 return;
             }
             if (!month) {
-                showToast('⚠️ Select starting month', 'error');
+                showToast('⚠️ Select start date', 'error');
                 return;
             }
             if (payment <= 0) {
-                showToast('⚠️ Payment must be > 0', 'error');
+                showToast('⚠️ Prize must be > 0', 'error');
                 return;
             }
 
             state.chittyInfo = { name, startMonth: month, monthlyPayment: payment };
             updateStats();
-            showToast(`✅ Chitty saved!`);
+            showToast(`✅ Event saved!`);
         }
 
         function updateStats() {
@@ -1220,7 +1037,7 @@
             document.getElementById('startMonth').value = '';
             document.getElementById('monthlyPayment').value = '';
             document.getElementById('participantInput').value = '';
-            document.getElementById('participantsList').innerHTML = '<div class="empty-state"><div class="empty-state-icon">👤</div><div style="font-size: 13px; margin-top: 8px;">No participants yet</div></div>';
+            document.getElementById('participantsList').innerHTML = '<div class="empty-state"><div class="empty-state-icon">👤</div><div style="font-size: 13px; margin-top: 8px;">No players yet</div></div>';
             document.getElementById('statsBox').style.display = 'none';
             document.getElementById('startBtn').disabled = true;
             showToast('✓ Cleared');
@@ -1254,7 +1071,7 @@
         function updateParticipants() {
             const list = document.getElementById('participantsList');
             if (state.participants.length === 0) {
-                list.innerHTML = '<div class="empty-state"><div class="empty-state-icon">👤</div><div style="font-size: 13px; margin-top: 8px;">No participants yet</div></div>';
+                list.innerHTML = '<div class="empty-state"><div class="empty-state-icon">👤</div><div style="font-size: 13px; margin-top: 8px;">No players yet</div></div>';
                 document.getElementById('startBtn').disabled = true;
             } else {
                 list.innerHTML = state.participants.map((p, i) => `
@@ -1265,29 +1082,29 @@
                 `).join('');
                 document.getElementById('startBtn').disabled = state.participants.length < 2;
             }
-            document.getElementById('participantCount').textContent = state.participants.length + ' Participant' + (state.participants.length !== 1 ? 's' : '');
+            document.getElementById('participantCount').textContent = state.participants.length + ' Player' + (state.participants.length !== 1 ? 's' : '');
             updateStats();
         }
 
         function startSpinningSession() {
             if (!state.chittyInfo.name) {
-                showToast('⚠️ Setup chitty first', 'error');
+                showToast('⚠️ Setup event first', 'error');
                 return;
             }
             if (state.participants.length < 2) {
-                showToast('⚠️ Need 2+ participants', 'error');
+                showToast('⚠️ Need 2+ players', 'error');
                 return;
             }
 
             document.getElementById('setupView').style.display = 'none';
             document.getElementById('spinningView').classList.add('active');
-            document.getElementById('sessionTitle').textContent = `🎡 ${state.chittyInfo.name}`;
+            document.getElementById('sessionTitle').textContent = `🏆 ${state.chittyInfo.name}`;
             createWheel();
             updateSpinningUI();
         }
 
         function exitSpinningSession() {
-            if (confirm('Exit? Unsaved winners will be lost.')) {
+            if (confirm('Exit? Progress will be lost.')) {
                 document.getElementById('spinningView').classList.remove('active');
                 document.getElementById('setupView').style.display = 'flex';
                 document.getElementById('winnerDisplay').textContent = '-';
@@ -1306,11 +1123,9 @@
                 seg.className = 'segment';
                 seg.style.backgroundColor = colors[idx % colors.length];
                 
-                // Calculate rotation for this segment
                 const rotation = anglePerSegment * idx;
                 seg.style.transform = `rotate(${rotation}deg)`;
                 
-                // Clip path to create pizza slice
                 const angle = anglePerSegment;
                 const x2 = 50 + 50 * Math.cos((angle - 90) * Math.PI / 180);
                 const y2 = 50 + 50 * Math.sin((angle - 90) * Math.PI / 180);
@@ -1332,30 +1147,27 @@
             document.getElementById('spinBtn').disabled = true;
             document.getElementById('nextBtn').classList.remove('show');
             document.getElementById('winnerDisplay').textContent = 'Spinning...';
+            document.getElementById('statusDisplay').textContent = 'Spinning...';
 
             const wheel = document.getElementById('wheel');
             const pointer = wheel.parentElement.querySelector('.pointer');
             const numParticipants = state.participants.length;
             const anglePerSegment = 360 / numParticipants;
             
-            // Add spinning animation to pointer
             pointer.classList.add('spinning');
             
-            // Random spins between 5-8 full rotations
             const fullSpins = 5 + Math.random() * 3;
             const randomSegment = Math.floor(Math.random() * numParticipants);
             const stopAngle = randomSegment * anglePerSegment;
             
-            // Total rotation: full spins + stop angle
             const totalRotation = fullSpins * 360 + stopAngle;
             
             const startRotation = state.currentRotation;
             const endRotation = (startRotation + totalRotation) % 360;
             
             let startTime = null;
-            const duration = 4000; // 4 second smooth spin
+            const duration = 4000;
             
-            // Easing function for smooth deceleration (ease-out cubic)
             const easeOutCubic = (t) => 1 - Math.pow(1 - t, 3);
 
             function animateSpin(currentTime) {
@@ -1364,7 +1176,6 @@
                 const elapsed = currentTime - startTime;
                 const progress = Math.min(elapsed / duration, 1);
                 
-                // Use easing function for smooth deceleration
                 const easedProgress = easeOutCubic(progress);
                 
                 const currentRotation = startRotation + (totalRotation * easedProgress);
@@ -1373,14 +1184,11 @@
                 if (progress < 1) {
                     requestAnimationFrame(animateSpin);
                 } else {
-                    // Final smooth position
                     state.currentRotation = endRotation;
                     wheel.style.transform = `rotate(${endRotation}deg)`;
                     
-                    // Remove spinning animation from pointer
                     pointer.classList.remove('spinning');
                     
-                    // Small delay before highlighting winner
                     setTimeout(() => {
                         const segments = wheel.querySelectorAll('.segment');
                         segments.forEach(seg => seg.classList.remove('winner-highlight'));
@@ -1389,7 +1197,6 @@
                             segments[randomSegment].classList.add('winner-highlight');
                         }
                         
-                        // Show winner info after a brief pause
                         setTimeout(() => {
                             state.currentWinner = { 
                                 name: state.participants[randomSegment], 
@@ -1397,10 +1204,11 @@
                             };
                             const pos = state.winners.length + 1;
                             const winnerDisplay = document.getElementById('winnerDisplay');
-                            winnerDisplay.textContent = getOrdinal(pos) + ' Winner';
+                            winnerDisplay.textContent = state.currentWinner.name;
                             winnerDisplay.classList.add('winner-announcement');
                             
-                            // Remove animation class after animation completes
+                            document.getElementById('statusDisplay').textContent = getOrdinal(pos) + ' Winner!';
+                            
                             setTimeout(() => {
                                 winnerDisplay.classList.remove('winner-announcement');
                             }, 600);
@@ -1434,7 +1242,8 @@
                 state.participants = [];
                 document.getElementById('wheel').innerHTML = '';
                 document.getElementById('spinBtn').disabled = true;
-                document.getElementById('spinBtn').textContent = '✓ ALL WINNERS!';
+                document.getElementById('spinBtn').textContent = '✓ FINISHED!';
+                document.getElementById('statusDisplay').textContent = 'All Done! 🎉';
                 updateSpinningUI();
             }
         }
@@ -1448,7 +1257,7 @@
                     <div class="participant-number">${i + 1}</div>
                     <div>${p}</div>
                 </div>
-            `).join('');
+            `).join('') || '<div style="text-align: center; opacity: 0.6; padding: 10px;">No more players</div>';
 
             const medals = ['🥇', '🥈', '🥉', '⭐'];
             document.getElementById('winnersList').innerHTML = state.winners.map((w, i) => `
@@ -1456,7 +1265,7 @@
                     <div class="winner-medal">${medals[i] || '⭐'}</div>
                     <div class="winner-name">${w.name}</div>
                 </div>
-            `).join('');
+            `).join('') || '<div style="text-align: center; opacity: 0.6; padding: 10px;">No winners yet</div>';
         }
 
         document.getElementById('participantInput').addEventListener('keypress', (e) => {
@@ -1466,6 +1275,16 @@
         document.getElementById('chittyName').addEventListener('keypress', (e) => {
             if (e.key === 'Enter') saveChittyInfo();
         });
+
+        // Prevent zoom on double-tap
+        let lastTouchEnd = 0;
+        document.addEventListener('touchend', function(event) {
+            let now = new Date().getTime();
+            if (now - lastTouchEnd <= 300) {
+                event.preventDefault();
+            }
+            lastTouchEnd = now;
+        }, false);
     </script>
 </body>
 </html>
