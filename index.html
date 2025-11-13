@@ -410,85 +410,102 @@
             height: 100%;
             border-radius: 50%;
             position: relative;
-            box-shadow: 0 0 0 10px rgba(255, 255, 255, 0.95), 
-                        0 0 0 12px rgba(0, 0, 0, 0.15),
-                        inset 0 0 40px rgba(0, 0, 0, 0.2),
-                        0 40px 100px rgba(0, 0, 0, 0.5);
-            background: radial-gradient(circle, #ffffff 0%, #f5f5f5 100%);
-            border: 3px solid rgba(255, 255, 255, 0.6);
+            box-shadow: 0 0 0 12px rgba(255, 255, 255, 0.95), 
+                        0 0 0 14px rgba(0, 0, 0, 0.15),
+                        inset 0 0 50px rgba(0, 0, 0, 0.25),
+                        0 50px 120px rgba(0, 0, 0, 0.6);
+            border: 4px solid rgba(255, 255, 255, 0.7);
+            transform-origin: center;
+            will-change: transform;
         }
 
         .pointer {
             position: absolute;
-            top: -30px;
+            top: -32px;
             left: 50%;
             transform: translateX(-50%);
             width: 0;
             height: 0;
-            border-left: 25px solid transparent;
-            border-right: 25px solid transparent;
-            border-top: 50px solid #ff6b9d;
+            border-left: 28px solid transparent;
+            border-right: 28px solid transparent;
+            border-top: 55px solid #ff6b9d;
             z-index: 10;
-            filter: drop-shadow(0 8px 20px rgba(255, 107, 157, 0.8));
+            filter: drop-shadow(0 10px 25px rgba(255, 107, 157, 0.9));
             animation: pulse 1.5s ease-in-out infinite;
         }
 
         .center-circle {
             position: absolute;
-            width: 130px;
-            height: 130px;
+            width: 140px;
+            height: 140px;
             background: linear-gradient(135deg, #ffffff 0%, #f0f0f0 100%);
             border-radius: 50%;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
             z-index: 5;
-            box-shadow: 0 0 0 5px rgba(255, 255, 255, 0.8),
-                        inset 0 6px 20px rgba(0, 0, 0, 0.1),
-                        0 15px 40px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 0 0 6px rgba(255, 255, 255, 0.85),
+                        inset 0 8px 25px rgba(0, 0, 0, 0.15),
+                        0 18px 50px rgba(0, 0, 0, 0.4);
             display: flex;
             align-items: center;
             justify-content: center;
-            border: 4px solid rgba(255, 107, 157, 0.15);
+            border: 5px solid rgba(255, 107, 157, 0.2);
         }
 
         .center-icon {
-            font-size: 60px;
-            filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.2));
+            font-size: 65px;
+            filter: drop-shadow(0 3px 10px rgba(0, 0, 0, 0.3));
         }
 
         .segment {
             position: absolute;
             width: 100%;
             height: 100%;
-            clip-path: polygon(50% 50%, 50% 0%, 100% 0%);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-weight: 800;
+            font-weight: 900;
             color: white;
-            text-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
-            border-right: 3px solid rgba(255, 255, 255, 0.3);
+            text-shadow: 0 5px 15px rgba(0, 0, 0, 0.7);
+            border-right: 2px solid rgba(255, 255, 255, 0.25);
             overflow: visible;
+            transition: filter 0.3s ease;
+        }
+
+        .segment.winner-highlight {
+            filter: brightness(1.3) drop-shadow(0 0 20px rgba(255, 255, 255, 0.8));
+            animation: winnerGlow 0.6s ease-out;
+        }
+
+        @keyframes winnerGlow {
+            0% {
+                filter: brightness(1) drop-shadow(0 0 0px rgba(255, 255, 255, 0));
+            }
+            50% {
+                filter: brightness(1.4) drop-shadow(0 0 30px rgba(255, 255, 255, 1));
+            }
+            100% {
+                filter: brightness(1.3) drop-shadow(0 0 20px rgba(255, 255, 255, 0.8));
+            }
         }
 
         .segment-name {
             position: absolute;
             text-align: center;
-            font-size: 20px;
-            font-weight: 800;
+            font-size: 22px;
+            font-weight: 900;
             writing-mode: vertical-rl;
             text-orientation: mixed;
-            transform: translateY(-120px) rotate(180deg);
-            max-width: 140px;
-            line-height: 1.3;
-            letter-spacing: 1px;
+            transform: translateY(-110px) rotate(180deg);
+            max-width: 150px;
+            line-height: 1.2;
+            letter-spacing: 1.5px;
             white-space: normal;
             z-index: 3;
             pointer-events: none;
-            word-spacing: 100vw;
             left: 50%;
-            transform: translateX(-50%) translateY(-120px) rotate(180deg);
+            transform: translateX(-50%) translateY(-110px) rotate(180deg);
         }
 
         .info-panel {
@@ -523,6 +540,33 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
+            min-height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            word-break: break-word;
+            animation: slideIn 0.4s ease-out;
+        }
+
+        .info-box-content.winner-announcement {
+            animation: bounceIn 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        @keyframes bounceIn {
+            0% {
+                opacity: 0;
+                transform: scale(0.3);
+            }
+            50% {
+                opacity: 1;
+                transform: scale(1.05);
+            }
+            70% {
+                transform: scale(0.95);
+            }
+            100% {
+                transform: scale(1);
+            }
         }
 
         .participants-box {
@@ -688,7 +732,17 @@
 
         @keyframes pulse {
             0%, 100% { transform: translateX(-50%) scale(1); }
-            50% { transform: translateX(-50%) scale(1.12); }
+            50% { transform: translateX(-50%) scale(1.15); }
+        }
+
+        @keyframes pulseSpin {
+            0% { transform: translateX(-50%) scale(1); }
+            50% { transform: translateX(-50%) scale(1.25); }
+            100% { transform: translateX(-50%) scale(1.2); }
+        }
+
+        .pointer.spinning {
+            animation: pulseSpin 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
         }
 
         @keyframes slideIn {
@@ -764,25 +818,24 @@
             }
 
             .pointer {
-                top: -22px;
-                border-left: 18px solid transparent;
-                border-right: 18px solid transparent;
-                border-top: 40px solid #ff6b9d;
+                top: -24px;
+                border-left: 20px solid transparent;
+                border-right: 20px solid transparent;
+                border-top: 42px solid #ff6b9d;
             }
 
             .center-circle {
-                width: 100px;
-                height: 100px;
+                width: 105px;
+                height: 105px;
             }
 
             .center-icon {
-                font-size: 45px;
+                font-size: 48px;
             }
 
             .segment-name {
-                font-size: 16px;
-                transform: translateX(-50%) translateY(-110px) rotate(180deg);
-                letter-spacing: 0.8px;
+                font-size: 18px;
+                letter-spacing: 1.2px;
             }
 
             .info-panel {
@@ -877,25 +930,24 @@
             }
 
             .pointer {
-                top: -18px;
-                border-left: 16px solid transparent;
-                border-right: 16px solid transparent;
-                border-top: 35px solid #ff6b9d;
+                top: -20px;
+                border-left: 18px solid transparent;
+                border-right: 18px solid transparent;
+                border-top: 36px solid #ff6b9d;
             }
 
             .center-circle {
-                width: 85px;
-                height: 85px;
+                width: 90px;
+                height: 90px;
             }
 
             .center-icon {
-                font-size: 38px;
+                font-size: 40px;
             }
 
             .segment-name {
-                font-size: 14px;
-                transform: translateX(-50%) translateY(-100px) rotate(180deg);
-                letter-spacing: 0.6px;
+                font-size: 15px;
+                letter-spacing: 1px;
             }
 
             .info-panel {
@@ -1246,18 +1298,26 @@
         function createWheel() {
             const wheel = document.getElementById('wheel');
             wheel.innerHTML = '';
-            const angle = 360 / state.participants.length;
+            const numParticipants = state.participants.length;
+            const anglePerSegment = 360 / numParticipants;
 
             state.participants.forEach((name, idx) => {
                 const seg = document.createElement('div');
                 seg.className = 'segment';
                 seg.style.backgroundColor = colors[idx % colors.length];
-                seg.style.transform = `rotate(${angle * idx}deg)`;
-                seg.style.clipPath = 'polygon(50% 50%, 50% 0%, 100% 0%)';
+                
+                // Calculate rotation for this segment
+                const rotation = anglePerSegment * idx;
+                seg.style.transform = `rotate(${rotation}deg)`;
+                
+                // Clip path to create pizza slice
+                const angle = anglePerSegment;
+                const x2 = 50 + 50 * Math.cos((angle - 90) * Math.PI / 180);
+                const y2 = 50 + 50 * Math.sin((angle - 90) * Math.PI / 180);
+                seg.style.clipPath = `polygon(50% 50%, 50% 0%, ${x2}% ${y2}%)`;
 
                 const txt = document.createElement('div');
                 txt.className = 'segment-name';
-                // Split name into individual characters for vertical display
                 txt.textContent = name.toUpperCase();
                 
                 seg.appendChild(txt);
@@ -1274,40 +1334,86 @@
             document.getElementById('winnerDisplay').textContent = 'Spinning...';
 
             const wheel = document.getElementById('wheel');
-            const spins = 5 + Math.random() * 3;
-            const stop = Math.random() * 360;
-            const total = spins * 360 + stop;
+            const pointer = wheel.parentElement.querySelector('.pointer');
+            const numParticipants = state.participants.length;
+            const anglePerSegment = 360 / numParticipants;
+            
+            // Add spinning animation to pointer
+            pointer.classList.add('spinning');
+            
+            // Random spins between 5-8 full rotations
+            const fullSpins = 5 + Math.random() * 3;
+            const randomSegment = Math.floor(Math.random() * numParticipants);
+            const stopAngle = randomSegment * anglePerSegment;
+            
+            // Total rotation: full spins + stop angle
+            const totalRotation = fullSpins * 360 + stopAngle;
+            
+            const startRotation = state.currentRotation;
+            const endRotation = (startRotation + totalRotation) % 360;
+            
+            let startTime = null;
+            const duration = 4000; // 4 second smooth spin
+            
+            // Easing function for smooth deceleration (ease-out cubic)
+            const easeOutCubic = (t) => 1 - Math.pow(1 - t, 3);
 
-            let vel = 25;
-            let rot = state.currentRotation;
-            const target = (state.currentRotation + total) % 360;
-
-            function anim() {
-                vel *= 0.98;
-                if (vel > 0.5) {
-                    rot += vel;
-                    wheel.style.transform = `rotate(${rot}deg)`;
-                    requestAnimationFrame(anim);
+            function animateSpin(currentTime) {
+                if (startTime === null) startTime = currentTime;
+                
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                
+                // Use easing function for smooth deceleration
+                const easedProgress = easeOutCubic(progress);
+                
+                const currentRotation = startRotation + (totalRotation * easedProgress);
+                wheel.style.transform = `rotate(${currentRotation}deg)`;
+                
+                if (progress < 1) {
+                    requestAnimationFrame(animateSpin);
                 } else {
-                    rot = target;
-                    wheel.style.transform = `rotate(${rot}deg)`;
-                    state.currentRotation = rot;
-
-                    const angle = 360 / state.participants.length;
-                    const norm = (360 - rot % 360) % 360;
-                    const idx = Math.floor(norm / angle) % state.participants.length;
-
+                    // Final smooth position
+                    state.currentRotation = endRotation;
+                    wheel.style.transform = `rotate(${endRotation}deg)`;
+                    
+                    // Remove spinning animation from pointer
+                    pointer.classList.remove('spinning');
+                    
+                    // Small delay before highlighting winner
                     setTimeout(() => {
-                        state.currentWinner = { name: state.participants[idx], index: idx };
-                        const pos = state.winners.length + 1;
-                        document.getElementById('winnerDisplay').textContent = getOrdinal(pos);
-                        document.getElementById('spinBtn').disabled = false;
-                        document.getElementById('nextBtn').classList.add('show');
-                        state.isSpinning = false;
-                    }, 500);
+                        const segments = wheel.querySelectorAll('.segment');
+                        segments.forEach(seg => seg.classList.remove('winner-highlight'));
+                        
+                        if (randomSegment < segments.length) {
+                            segments[randomSegment].classList.add('winner-highlight');
+                        }
+                        
+                        // Show winner info after a brief pause
+                        setTimeout(() => {
+                            state.currentWinner = { 
+                                name: state.participants[randomSegment], 
+                                index: randomSegment 
+                            };
+                            const pos = state.winners.length + 1;
+                            const winnerDisplay = document.getElementById('winnerDisplay');
+                            winnerDisplay.textContent = getOrdinal(pos) + ' Winner';
+                            winnerDisplay.classList.add('winner-announcement');
+                            
+                            // Remove animation class after animation completes
+                            setTimeout(() => {
+                                winnerDisplay.classList.remove('winner-announcement');
+                            }, 600);
+                            
+                            document.getElementById('spinBtn').disabled = false;
+                            document.getElementById('nextBtn').classList.add('show');
+                            state.isSpinning = false;
+                        }, 300);
+                    }, 200);
                 }
             }
-            anim();
+            
+            requestAnimationFrame(animateSpin);
         }
 
         function declareWinner() {
